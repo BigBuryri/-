@@ -5,7 +5,7 @@
       let digits = phone.value.replace(/\D/g, "");
       if (!digits) return;
       if (digits[0] !== "8") digits = "8" + digits.slice(1);
-      digits = digits.slice(0, 11); // 8 + 10
+      digits = digits.slice(0, 11); 
       const p1 = digits.slice(1, 4);
       const p2 = digits.slice(4, 7);
       const p3 = digits.slice(7, 9);
@@ -35,34 +35,34 @@
     });
   }
 
-  
+
   const slider = document.querySelector(".slider");
-  if (slider) {
-    const imgs = Array.from(slider.querySelectorAll(".slider__img"));
-    const prevBtn = slider.querySelector(".slider__btn--prev");
-    const nextBtn = slider.querySelector(".slider__btn--next");
-    const interval = parseInt(slider.dataset.interval || "3000", 10);
+  if (!slider) return;
 
-    let idx = imgs.findIndex(i => i.classList.contains("is-active"));
-    if (idx < 0) idx = 0;
+  const imgs = Array.from(slider.querySelectorAll(".slider__img"));
+  const prevBtn = slider.querySelector(".sliderbtn--prev");
+  const nextBtn = slider.querySelector(".sliderbtn--next");
+  const interval = parseInt(slider.dataset.interval || "3000", 10);
 
-    function show(n) {
-      imgs[idx].classList.remove("is-active");
-      idx = (n + imgs.length) % imgs.length;
-      imgs[idx].classList.add("is-active");
-    }
+  let idx = imgs.findIndex(i => i.classList.contains("is-active"));
+  if (idx < 0) idx = 0;
 
-    function next() { show(idx + 1); }
-    function prev() { show(idx - 1); }
-
-    let t = setInterval(next, interval);
-
-    function resetTimer() {
-      clearInterval(t);
-      t = setInterval(next, interval);
-    }
-
-    nextBtn?.addEventListener("click", () => { next(); resetTimer(); });
-    prevBtn?.addEventListener("click", () => { prev(); resetTimer(); });
+  function show(n) {
+    imgs[idx].classList.remove("is-active");
+    idx = (n + imgs.length) % imgs.length;
+    imgs[idx].classList.add("is-active");
   }
+
+  function next() { show(idx + 1); }
+  function prev() { show(idx - 1); }
+
+  let t = setInterval(next, interval);
+
+  function resetTimer() {
+    clearInterval(t);
+    t = setInterval(next, interval);
+  }
+
+  nextBtn?.addEventListener("click", () => { next(); resetTimer(); });
+  prevBtn?.addEventListener("click", () => { prev(); resetTimer(); });
 })();
