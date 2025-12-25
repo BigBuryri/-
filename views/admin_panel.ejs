@@ -1,0 +1,107 @@
+<% const title = "Панель администратора — Корочки.есть"; %>
+<%- include("partials/top", { title }) %>
+
+<div class="row row--space row--wrap">
+  <div>
+    <h1 class="h1">Панель администратора</h1>
+    <p class="muted">Все заявки. Фильтры, пагинация, смена статуса.</p>
+  </div>
+  <a class="btn btn--ghost" href="/admin/logout">Выйти</a>
+</div>
+
+<section class="card card--glass mb">
+  <form class="form form--filters" method="get" action="/admin">
+    <div class="field">
+      <label>Поиск (логин/ФИО)</label>
+      <input name="q" value="<%= filters.q %>" placeholder="Например: ivan или Иванов" />
+    </div>
+
+    <div class="field">
+      <label>Статус</label>
+      <select name="status">
+        <option value="">Все</option>
+        <% statuses.forEach(s => { %>
+          <option value="<%= s %>" <%= (filters.status===s) ? "selected" : "" %>><%= s %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Курс</label>
+      <select name="course">
+        <option value="">Все</option>
+        <% courses.forEach(c => { %>
+          <option value="<%= c %>" <%= (filters.course===c) ? "selected" : "" %>><%= c %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>&nbsp;</label>
+      <button class="btn btn--primary btn--block">Применить</button>
+    </div>
+  </form>
+</section>
+
+<section class="card card--glass">
+  <div class="table">
+    <div class="table__head">
+      <div>#</div>
+      <div>Пользователь</div>
+      <div>Курс</div>
+      <div>Старт</div>
+      <div>Оплата</div>
+      <div>Статус</div>
+      <div class="right">Действия</div>
+    </div>
+
+    <% if (items.length) { %>
+      <% items.forEach(a => { %>
+        <div class="table__row">
+          <div>#<%= a.id %></div>
+          <div>
+            <div class="strong"><%= a.full_name %></div>
+            <div class="muted small">@<%= a.login %> • <%= a.phone %></div>
+          </div>
+          <div><%= a.course_name %></div>
+          <div><%= new Date(a.desired_start_date).toLocaleDateString("ru-RU") %></div>
+          <div><%= a.payment_method === "cash" ? "Наличными" : "Перевод" %></div>
+          <div>
+            <span class="pill <%= a.status === "Обучение завершено" ? "pill--success" : (a.status === "Идет обучение" ? "pill--warn" : "pill--info") %>"><%= a.status %></span>
+          </div>
+          <div class="right">
+            <form class="row row--gap" method="post" action="/admin/applications/<%= a.id %>/status">
+              <select name="status">
+                <% statuses.forEach(s => { %>
+                  <option value="<%= s %>" <%= (a.status===s) ? "selected" : "" %>><%= s %></option>
+                <% }) %>
+              </select>
+              <button class="btn btn--success">Сохранить</button>
+            </form>
+          </div>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <div class="pad muted">Ничего не найдено 🤷</div>
+    <% } %>
+  </div>
+</section>
+
+<% if (pages > 1) { %>
+  <nav class="pager">
+    <% function qs(p) { 
+      const params = new URLSearchParams({ ...filters, page: String(p) });
+      return "/admin?" + params.toString();
+    } %>
+
+    <a class="btn btn--ghost <%= page<=1 ? "is-disabled" : "" %>" href="<%= qs(Math.max(1, page-1)) %>">«</a>
+
+    <% for (let p=1; p<=pages; p++) { %>
+      <a class="btn <%= p===page ? "btn--primary" : "btn--ghost" %>" href="<%= qs(p) %>"><%= p %></a>
+    <% } %>
+
+    <a class="btn btn--ghost <%= page>=pages ? "is-disabled" : "" %>" href="<%= qs(Math.min(pages, page+1)) %>">»</a>
+  </nav>
+<% } %>
+
+<%- include("partials/bottom") %>
